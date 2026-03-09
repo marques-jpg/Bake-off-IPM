@@ -209,6 +209,8 @@ function continueTest()
 // Creates and positions the UI targets
 function createTargets(target_size, horizontal_gap, vertical_gap)
 {
+  targets = [];
+
   // Define the margins between targets by dividing the white space 
   // for the number of targets minus one
   h_margin = horizontal_gap / (GRID_COLUMNS -1);
@@ -230,6 +232,17 @@ function createTargets(target_size, horizontal_gap, vertical_gap)
       let target = new Target(target_x, target_y, target_size, target_label, target_id);
       targets.push(target);
     }  
+  }
+
+  targets.sort((a, b) => a.label.localeCompare(b.label, 'pt', { sensitivity: 'base' }));
+
+  for (var i = 0; i < targets.length; i++)
+  {
+    let sorted_row = floor(i / GRID_COLUMNS);
+    let sorted_col = i % GRID_COLUMNS;
+
+    targets[i].x = 40 + (h_margin + target_size) * sorted_col + target_size / 2;
+    targets[i].y = 40 + (v_margin + target_size) * sorted_row + target_size / 2;
   }
 }
 
