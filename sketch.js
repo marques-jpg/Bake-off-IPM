@@ -246,6 +246,7 @@ function createTargets(target_size, horizontal_gap, vertical_gap)
   }
 }
 
+
 // Is invoked when the canvas is resized (e.g., when we go fullscreen)
 function windowResized() 
 {

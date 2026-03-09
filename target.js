@@ -21,6 +21,7 @@ class Target
   {
     const firstChar = (this.label).trim().charAt(0).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
+    
     const letterColors = {
       a: [102, 204, 0],
       b: [230, 126, 34],
