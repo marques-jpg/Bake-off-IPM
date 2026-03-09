@@ -10,3 +10,7 @@ De seguida vai aparecer no canto inferior direito um botão que diz 'Go live'.
 Quando clicarem, vai abrir uma nova aba no vosso browser predefinido com o programa a funcionar.
 
 Caso queiram desligar o server clicam outra vez onde carregaram inicialmente para abrirem o server, que agora há de dizer algo como 'Port: 5500' (Eu acho que o número da porta varia), e o servidor desliga-se.
+
+## License
+
+MIT License © 2025 Guilherme Marques.
