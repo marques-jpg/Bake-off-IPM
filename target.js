@@ -23,33 +23,45 @@ class Target
 
     
     const letterColors = {
-      a: [102, 204, 0],
-      b: [230, 126, 34],
-      c: [214, 48, 128],
-      d: [44, 130, 201],
-      e: [39, 174, 96],
-      f: [99, 110, 114],
-      g: [0, 102, 204],
-      h: [230, 126, 34],
-      i: [214, 48, 128],
-      j: [44, 130, 201],
-      k: [39, 174, 96],
-      l: [99, 110, 114],
-      m: [0, 102, 204],
-      n: [230, 126, 34],
-      o: [214, 48, 128],
-      p: [44, 130, 201],
-      q: [39, 174, 96],
-      r: [99, 110, 114],
-      s: [0, 102, 204],
-      t: [230, 126, 34],
-      u: [214, 48, 128],
-      v: [44, 130, 201],
-      w: [39, 174, 96],
-      x: [99, 110, 114],
-      y: [0, 102, 204],
-      z: [230, 126, 34]
+      // Vermelhos e Castanhos (A-D)
+      a: [180, 0, 0],      // Vermelho Puro
+      b: [110, 0, 0],      // Vinho/Bordeaux
+      c: [200, 70, 0],     // Laranja Escuro Brilhante
+      d: [110, 50, 20],    // Castanho Terra
+
+      // Laranjas e Olivas (E-H)
+      e: [160, 100, 0],    // Ouro Escuro
+      f: [130, 130, 0],    // Mostarda / Oliva Claro
+      g: [80, 90, 0],      // Verde Oliva Médio
+      h: [55, 75, 25],     // Verde Tropa Profundo
+
+      // Verdes (I-K)
+      i: [0, 110, 0],      // Verde Floresta
+      j: [0, 70, 40],      // Verde Garrafa
+      k: [30, 100, 80],    // Verde Mar / Turquesa
+
+      // AZUIS: Diferenciação L-O
+      l: [0, 140, 140],    // Ciano Petróleo (Mais esverdeado)
+      m: [20, 80, 200],    // Azul Real (Mais aberto e elétrico)
+      n: [0, 40, 120],     // Azul Marinho Clássico
+      o: [30, 30, 80],     // Azul Noite / Indigo
+
+      // ROXOS E QUENTES: Diferenciação P-U
+      p: [100, 0, 180],    // Roxo Violeta (Frio)
+      q: [150, 0, 150],    // Magenta Puro (Vibrante)
+      r: [160, 0, 80],     // Framboesa / Carmesim (Rosado)
+      s: [130, 40, 60],    // Ameixa / Marsala (Misto/Sóbrio)
+      t: [180, 60, 20],    // Tijolo / Terracota (Laranja-Avermelhado)
+      u: [140, 90, 40],    // Bronze / Ocre Escuro
+
+      // Finalização (V-Z)
+      v: [100, 100, 120],  // Cinza Lavanda
+      w: [70, 70, 70],     // Cinza Médio
+      x: [100, 60, 50],    // Rosa Velho Mate
+      y: [40, 60, 60],     // Ardósia
+      z: [25, 25, 25]      // Quase Preto
     };
+
 
     const rgb = letterColors[firstChar];
     return color(rgb[0], rgb[1], rgb[2]);
