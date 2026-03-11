@@ -33,6 +33,7 @@ let targets               = [];
 const GRID_ROWS           = 8;      // We divide our 80 targets in a 8x10 grid
 const GRID_COLUMNS        = 10;     // We divide our 80 targets in a 8x10 grid
 
+let synth;
 // Ensures important data is loaded before the program starts
 function preload()
 {
@@ -42,13 +43,16 @@ function preload()
 }
 
 // Runs once at the start
+// Runs once at the start
 function setup()
 {
-  createCanvas(700, 500);    // window size in px before we go into fullScreen()
-  frameRate(60);             // frame rate (DO NOT CHANGE!)
+  createCanvas(700, 500);    
+  frameRate(60);             
   
-  randomizeTrials();         // randomize the trial order at the start of execution
-  drawUserIDScreen();        // draws the user start-up screen (student ID and display size)
+  synth = new p5.MonoSynth(); // <--- ADICIONA ESTA LINHA AQUI
+  
+  randomizeTrials();         
+  drawUserIDScreen();        
 }
 
 // Runs every frame and redraws the screen
@@ -161,8 +165,22 @@ function mousePressed()
       if (targets[i].clicked(mouseX, mouseY)) 
       {
         // Checks if it was the correct target
-        if (targets[i].id === trials[current_trial] + 1) hits++;
-        else misses++;
+        if (targets[i].id === trials[current_trial] + 1) {
+          hits++;
+          
+          try {
+            // Som de ACERTO: nota alta, volume mais baixo (0.3), duração curta (0.1s)
+            if (typeof synth !== 'undefined') synth.play('C6', 0.3, 0, 0.1);
+          } catch (e) { console.log("Erro no som: ", e); }
+        }
+        else {
+          misses++;
+          
+          try {
+            // Som de ERRO: nota grave, volume no MÁXIMO (1.0), duração maior (0.3s)
+            if (typeof synth !== 'undefined') synth.play('C3', 1.0, 0, 0.3);
+          } catch (e) { console.log("Erro no som: ", e); }
+        }
         
         current_trial++;              // Move on to the next trial/target
         break;
@@ -212,42 +230,54 @@ function createTargets(target_size, horizontal_gap, vertical_gap)
 {
   targets = [];
 
-  // Define the margins between targets by dividing the white space 
-  // for the number of targets minus one
-  h_margin = horizontal_gap / (GRID_COLUMNS -1);
-  v_margin = vertical_gap / (GRID_ROWS - 1);
+  // O target_size já vem calculado como exatos 2cm físicos para qualquer ecrã!
+  let t_size = target_size; 
   
-  // Set targets in a 8 x 10 grid
+  // Vamos usar um gap de 2 pixéis apenas para ter uma linha divisória elegante 
+  // (se quiseres que fiquem 100% colados como na tua foto, muda para 0)
+  let gap = 2; 
+  
+  // Calcular o tamanho total físico deste "bloco" de botões
+  let total_grid_w = (t_size * GRID_COLUMNS) + (gap * (GRID_COLUMNS - 1));
+  let total_grid_h = (t_size * GRID_ROWS) + (gap * (GRID_ROWS - 1));
+  
+  // Centrar o bloco matematicamente no ecrã
+  // (height - 40) porque a barra de texto no fundo ocupa 40 pixéis
+  let start_x = (width - total_grid_w) / 2;
+  let start_y = ((height - 40) - total_grid_h) / 2;
+  
+  // Gerar os alvos na grelha 8x10
   for (var r = 0; r < GRID_ROWS; r++)
   {
     for (var c = 0; c < GRID_COLUMNS; c++)
     {
-      let target_x = 40 + (h_margin + target_size) * c + target_size/2;        // give it some space from the left
-      let target_y = 40 + (v_margin + target_size) * r + target_size/2;        // give it some space from the top
+      // O centro de cada quadrado (+ t_size / 2 para as hitboxes funcionarem)
+      let target_x = start_x + (t_size + gap) * c + t_size / 2;
+      let target_y = start_y + (t_size + gap) * r + t_size / 2;
       
-      // Find the appropriate label and ID for this target
       let legendas_index = c + GRID_COLUMNS * r;
       let target_id = legendas.getNum(legendas_index, 0);  
       let target_label = legendas.getString(legendas_index, 1);   
       
-      let target = new Target(target_x, target_y, target_size, target_label, target_id);
+      // Passar t_size tanto para largura como para altura (quadrados perfeitos)
+      let target = new Target(target_x, target_y, t_size, t_size, target_label, target_id);
       targets.push(target);
     }  
   }
 
+  // Ordenar alfabeticamente
   targets.sort((a, b) => a.label.localeCompare(b.label, 'pt', { sensitivity: 'base' }));
 
+  // Aplicar as coordenadas ordenadas
   for (var i = 0; i < targets.length; i++)
   {
     let sorted_row = floor(i / GRID_COLUMNS);
     let sorted_col = i % GRID_COLUMNS;
 
-    targets[i].x = 40 + (h_margin + target_size) * sorted_col + target_size / 2;
-    targets[i].y = 40 + (v_margin + target_size) * sorted_row + target_size / 2;
+    targets[i].x = start_x + (t_size + gap) * sorted_col + t_size / 2;
+    targets[i].y = start_y + (t_size + gap) * sorted_row + t_size / 2;
   }
 }
-
-
 // Is invoked when the canvas is resized (e.g., when we go fullscreen)
 function windowResized() 
 {
