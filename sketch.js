@@ -9,6 +9,7 @@
 const GROUP_NUMBER        = 2;     // Add your group number here as an integer (e.g., 2, 3)
 const RECORD_TO_FIREBASE  = true;  // Set to 'true' to record user results to Firebase
 
+
 // Pixel density and setup variables (DO NOT CHANGE!)
 let PPI, PPCM;
 const NUM_OF_TRIALS       = 12;     // The numbers of trials (i.e., target selections) to be completed
