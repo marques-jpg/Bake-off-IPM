@@ -178,7 +178,7 @@ function mousePressed()
           
           try {
             // Som de ERRO: nota grave, volume no MÁXIMO (1.0), duração maior (0.3s)
-            if (typeof synth !== 'undefined') synth.play('C3', 1.0, 0, 0.3);
+            if (typeof synth !== 'undefined') synth.play('C4', 1.0, 0, 0.3);
           } catch (e) { console.log("Erro no som: ", e); }
         }
         
