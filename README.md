@@ -1,3 +1,3 @@
 ## License
 
-MIT License © 2025 Guilherme Marques.
+MIT License © 2026 Guilherme Marques.
