@@ -55,6 +55,15 @@ class Target
   {
     // Draw target as a rectangle
     fill(this.getColorByInitial());
+    if (this.clicked(mouseX, mouseY)) {
+      stroke(255);       // Borda branca
+      strokeWeight(3);   // Grossura da borda
+    } else {
+      noStroke();        // Sem borda se o rato não estiver por cima
+    }
+    
+    rect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+    noStroke();
     rect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
 
     // Identificar a letra inicial deste target
@@ -93,7 +102,11 @@ class Target
     textStyle(BOLD);
     textLeading(13); // Mantém as linhas mais compactas umas das outras
     fill(color(255, 255, 255));
+    stroke(0);        // Contorno preto
+    strokeWeight(2);
     textAlign(CENTER, CENTER); 
+    
+      // Grossura do contorno (fino mas eficaz)
     
     // O grande truque: substitui os espaços por quebras de linha ("Enter").
     // Assim as palavras nunca são cortadas a meio!
@@ -101,5 +114,6 @@ class Target
     
     // Desenha o texto centrado no botão
     text(multiLineLabel, this.x, this.y);
+    noStroke(); 
   }
 }
