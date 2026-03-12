@@ -6,7 +6,7 @@
 // p5.js reference: https://p5js.org/reference/
 
 // Database (CHANGE THESE!)
-const GROUP_NUMBER        = 6;     // Add your group number here as an integer (e.g., 2, 3)
+const GROUP_NUMBER        = 1;     // Add your group number here as an integer (e.g., 2, 3)
 const RECORD_TO_FIREBASE  = true;  // Set to 'true' to record user results to Firebase
 
 

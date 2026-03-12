@@ -49,7 +49,7 @@ class Target
     return color(rgb[0], rgb[1], rgb[2]);
   }
   
-  // Draws the target (i.e., a rectangle)
+// Draws the target (i.e., a rectangle)
   // and its label
   draw()
   {
@@ -62,8 +62,6 @@ class Target
       noStroke();        // Sem borda se o rato não estiver por cima
     }
     
-    rect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
-    noStroke();
     rect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
 
     // Identificar a letra inicial deste target
@@ -92,25 +90,58 @@ class Target
       rect(boxX, boxY, boxSize, boxSize);
       
       fill(0); 
-      textFont("Arial", 12);
+      textFont("Arial", 18);
+      textStyle(BOLD);
       textAlign(CENTER, CENTER);
       text(myChar, boxX + boxSize / 2, boxY + boxSize / 2 + 1);
     }
     
-    // Draw label
-    textFont("Arial", 14);
+    // O grande truque: substitui os espaços por quebras de linha ("Enter").
+    let multiLineLabel = this.label.trim().split(' ').join('\n');
+    let lines = multiLineLabel.split('\n');
+
+    // Preparar fonte base
+    textFont("Arial");
     textStyle(BOLD);
-    textLeading(13); // Mantém as linhas mais compactas umas das outras
+    
+    // --- INÍCIO DO AJUSTE DINÂMICO DE TAMANHO ---
+    let fontSize = 18;
+    textSize(fontSize);
+    textLeading(13);
+    
+    let padding = 8; // Margem para garantir que o texto não cola nas bordas
+    
+    // Reduz a fonte até que a palavra mais larga e a altura total caibam no alvo
+    while (fontSize > 6) {
+      let maxLineWidth = 0;
+      
+      // Descobrir a largura da linha mais comprida
+      for (let i = 0; i < lines.length; i++) {
+        let lw = textWidth(lines[i]);
+        if (lw > maxLineWidth) {
+          maxLineWidth = lw;
+        }
+      }
+      
+      // Calcular a altura ocupada pelo texto
+      let totalTextHeight = lines.length * (fontSize * 0.9);
+      
+      // Se couber tanto na largura como na altura, saímos do ciclo
+      if (maxLineWidth <= (this.width - padding) && totalTextHeight <= (this.height - padding)) {
+        break; 
+      }
+      
+      // Caso contrário, reduz o tamanho e o espaçamento da linha e tenta novamente
+      fontSize--;
+      textSize(fontSize);
+      textLeading(fontSize * 0.9);
+    }
+    // --- FIM DO AJUSTE DINÂMICO DE TAMANHO ---
+
     fill(color(255, 255, 255));
     stroke(0);        // Contorno preto
     strokeWeight(2);
     textAlign(CENTER, CENTER); 
-    
-      // Grossura do contorno (fino mas eficaz)
-    
-    // O grande truque: substitui os espaços por quebras de linha ("Enter").
-    // Assim as palavras nunca são cortadas a meio!
-    let multiLineLabel = this.label.trim().split(' ').join('\n');
     
     // Desenha o texto centrado no botão
     text(multiLineLabel, this.x, this.y);
