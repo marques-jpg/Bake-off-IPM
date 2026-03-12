@@ -157,6 +157,9 @@ function printAndSavePerformance()
 // Mouse button was pressed - lets test to see if hit was in the correct target
 function mousePressed() 
 {
+  if (getAudioContext().state !== 'running') {
+    getAudioContext().resume();
+  }
   // Only look for mouse releases during the actual test
   // (i.e., during target selections)
   if (draw_targets)
