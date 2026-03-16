@@ -6,7 +6,7 @@
 // p5.js reference: https://p5js.org/reference/
 
 // Database (CHANGE THESE!)
-const GROUP_NUMBER        = 1;     // Add your group number here as an integer (e.g., 2, 3)
+const GROUP_NUMBER        = 2;     // Add your group number here as an integer (e.g., 2, 3)
 const RECORD_TO_FIREBASE  = true;  // Set to 'true' to record user results to Firebase
 
 
@@ -231,59 +231,104 @@ function continueTest()
 }
 
 // Creates and positions the UI targets
+// Creates and positions the UI targets
 function createTargets(target_size, horizontal_gap, vertical_gap)
 {
   targets = [];
-
-  // Regra 7: O alvo mantém rigorosamente os 2cm (target_size). NUNCA se altera.
   let t_size = target_size; 
-  
-  // Calcular o espaço útil real do ecrã (descontando 40px no topo e 40px na base)
-  let available_h = height - 80;
-  let required_h = t_size * GRID_ROWS;
-  
-  // Calcular qual é o intervalo vertical máximo que o ecrã permite ter
-  let max_v_gap = (available_h - required_h) / (GRID_ROWS - 1);
-  
-  // Queremos um intervalo de 2px. MAS se o ecrã for pequeno, usamos o max_v_gap 
-  // (mesmo que seja zero ou negativo) para forçar os alvos a caber na tela sem cortar!
-  let gap_y = min(2, max_v_gap); 
-  let gap_x = 2; // Na horizontal há sempre espaço de sobra
-  
-  let total_grid_w = (t_size * GRID_COLUMNS) + (gap_x * (GRID_COLUMNS - 1));
-  let total_grid_h = (t_size * GRID_ROWS) + (gap_y * (GRID_ROWS - 1));
-  
-  // Centrar no ecrã com precisão milimétrica
-  let start_x = (width - total_grid_w) / 2;
-  let start_y = 40 + (available_h - total_grid_h) / 2;
-  
-  // Gerar os alvos na grelha 8x10
-  for (var r = 0; r < GRID_ROWS; r++)
-  {
-    for (var c = 0; c < GRID_COLUMNS; c++)
-    {
-      let target_x = start_x + (t_size + gap_x) * c + t_size / 2;
-      let target_y = start_y + (t_size + gap_y) * r + t_size / 2;
-      
+  let gap_x = 2; // Espaço horizontal entre botões
+
+  // A GRANDE MUDANÇA: Calcula o MÁXIMO de botões que cabem na largura do ecrã
+  // (O "40" é para deixar apenas 20px de margem de cada lado e usar tudo o resto)
+  let max_cols = floor((width - 40) / (t_size + gap_x));
+
+  // 1. Instanciar os 80 alvos
+  for (var r = 0; r < GRID_ROWS; r++) {
+    for (var c = 0; c < GRID_COLUMNS; c++) {
       let legendas_index = c + GRID_COLUMNS * r;
       let target_id = legendas.getNum(legendas_index, 0);  
       let target_label = legendas.getString(legendas_index, 1);   
       
-      let target = new Target(target_x, target_y, t_size, t_size, target_label, target_id);
+      let target = new Target(0, 0, t_size, t_size, target_label, target_id);
       targets.push(target);
     }  
   }
 
-  // Ordenar alfabeticamente para a procura visual ser instantânea
+  // 2. Ordenar alfabeticamente
   targets.sort((a, b) => a.label.localeCompare(b.label, 'pt', { sensitivity: 'base' }));
 
-  for (var i = 0; i < targets.length; i++)
-  {
-    let sorted_row = floor(i / GRID_COLUMNS);
-    let sorted_col = i % GRID_COLUMNS;
+  // 3. Agrupar os alvos pela letra inicial
+  let groups = [];
+  let current_char = "";
+  let current_group = [];
+  
+  for (let i = 0; i < targets.length; i++) {
+    let char = targets[i].label.trim().charAt(0).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (char !== current_char) {
+      if (current_group.length > 0) groups.push(current_group);
+      current_char = char;
+      current_group = [];
+    }
+    current_group.push(targets[i]);
+  }
+  if (current_group.length > 0) groups.push(current_group);
 
-    targets[i].x = start_x + (t_size + gap_x) * sorted_col + t_size / 2;
-    targets[i].y = start_y + (t_size + gap_y) * sorted_row + t_size / 2;
+  // 4. Distribuir os grupos por linhas usando a LARGURA MÁXIMA do ecrã
+  let rows = [];
+  let current_row = [];
+
+  for (let i = 0; i < groups.length; i++) {
+    let group = groups[i];
+    
+    // Se o grupo couber na linha atual, junta-se aos outros de forma contínua
+    if (current_row.length + group.length <= max_cols) {
+      current_row.push(...group);
+    } else {
+      // Se não couber, fechamos a linha atual e passamos o grupo inteiro para a próxima
+      if (current_row.length > 0) {
+        rows.push(current_row);
+        current_row = [];
+      }
+      
+      // Caso extremo: Se uma ÚNICA letra tiver MAIS palavras do que a largura total do ecrã
+      if (group.length > max_cols) {
+         for (let j = 0; j < group.length; j++) {
+             current_row.push(group[j]);
+             if (current_row.length === max_cols) {
+                 rows.push(current_row);
+                 current_row = [];
+             }
+         }
+      } else {
+         current_row.push(...group);
+      }
+    }
+  }
+  if (current_row.length > 0) rows.push(current_row);
+
+  let total_linhas = rows.length;
+
+  // 5. Calcular margens para centrar o bloco perfeitamente no ecrã (vertical e horizontal)
+  let available_h = height - 80;
+  let required_h = t_size * total_linhas;
+  
+  let max_v_gap = total_linhas > 1 ? (available_h - required_h) / (total_linhas - 1) : 0;
+  let gap_y = min(2, max_v_gap); 
+
+  let total_grid_h = (t_size * total_linhas) + (gap_y * (total_linhas - 1));
+  let start_y = 40 + (available_h - total_grid_h) / 2;
+
+  // 6. Atribuir o X e Y final a cada alvo
+  for (let r = 0; r < rows.length; r++) {
+    let row_items = rows[r];
+    
+    let row_width = (t_size * row_items.length) + (gap_x * (row_items.length - 1));
+    let start_x = (width - row_width) / 2;
+
+    for (let c = 0; c < row_items.length; c++) {
+      row_items[c].x = start_x + (t_size + gap_x) * c + t_size / 2;
+      row_items[c].y = start_y + (t_size + gap_y) * r + t_size / 2;
+    }
   }
 }
 // Is invoked when the canvas is resized (e.g., when we go fullscreen)
