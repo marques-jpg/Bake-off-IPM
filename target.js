@@ -9,6 +9,7 @@ class Target
     this.height = h; 
     this.label  = l;
     this.id     = id;
+    this.isHit = false;
   }
   
   // Checks if a mouse click took place
@@ -20,6 +21,7 @@ class Target
     return (mouse_x >= this.x - half_w && mouse_x <= this.x + half_w &&
             mouse_y >= this.y - half_h && mouse_y <= this.y + half_h);
   }
+
 
   getColorByInitial()
   {
@@ -104,6 +106,7 @@ class Target
     textFont("Arial");
     textStyle(BOLD);
     
+    
     // --- INÍCIO DO AJUSTE DINÂMICO DE TAMANHO ---
     let fontSize = 18;
     textSize(fontSize);
@@ -138,7 +141,11 @@ class Target
     }
     // --- FIM DO AJUSTE DINÂMICO DE TAMANHO ---
 
-    fill(color(255, 255, 255));
+    if (this.isHit) {
+      fill(color(255, 255, 0)); // Verde (podes alterar para a cor que preferires)
+    } else {
+      fill(color(255, 255, 255)); // Branco (cor padrão)
+    }
     stroke(0);        // Contorno preto
     strokeWeight(2);
     textAlign(CENTER, CENTER); 

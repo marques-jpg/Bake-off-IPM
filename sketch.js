@@ -172,7 +172,7 @@ function mousePressed()
         // Checks if it was the correct target
         if (targets[i].id === trials[current_trial] + 1) {
           hits++;
-          
+          targets[i].isHit = true;
           try {
             // Som de ACERTO: nota muito aguda, volume baixo, rápido
             if (typeof synth !== 'undefined') synth.play('C6', 0.3, 0, 0.1);
@@ -185,6 +185,7 @@ function mousePressed()
             // Som de ERRO: nota grave, volume no MÁXIMO (1.0), duração maior (0.3s)
             if (typeof synth !== 'undefined') synth.play('C4', 1.0, 0, 0.3);
           } catch (e) { console.log("Erro no som: ", e); }
+
         }
         
         current_trial++;              // Move on to the next trial/target
@@ -223,6 +224,10 @@ function continueTest()
   hits = 0;
   misses = 0;
   
+  for (let i = 0; i < targets.length; i++) {
+    targets[i].isHit = false; 
+  }
+
   current_trial = 0;
   continue_button.remove();
   
