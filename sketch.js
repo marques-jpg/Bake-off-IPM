@@ -34,6 +34,7 @@ const GRID_ROWS           = 8;      // We divide our 80 targets in a 8x10 grid
 const GRID_COLUMNS        = 10;     // We divide our 80 targets in a 8x10 grid
 
 let synth;
+
 // Ensures important data is loaded before the program starts
 function preload()
 {
@@ -43,7 +44,6 @@ function preload()
 }
 
 // Runs once at the start
-// Runs once at the start
 function setup()
 {
   createCanvas(700, 500);   
@@ -51,7 +51,7 @@ function setup()
   frameRate(60);             
   
   cursor(CROSS);
-  synth = new p5.MonoSynth(); // <--- ADICIONA ESTA LINHA AQUI
+  synth = new p5.MonoSynth(); // Initialize audio synthesizer
   
   randomizeTrials();         
   drawUserIDScreen();        
@@ -174,18 +174,14 @@ function mousePressed()
           hits++;
           targets[i].isHit = true;
           try {
-            // Som de ACERTO: nota muito aguda, volume baixo, rápido
-            if (typeof synth !== 'undefined') synth.play('C6', 0.3, 0, 0.1);
+            if (typeof synth !== 'undefined') synth.play('C6', 0.3, 0, 0.1); // Play hit sound
           } catch (e) { console.log("Erro no som: ", e); }
         }
         else {
           misses++;
-          
           try {
-            // Som de ERRO: nota grave, volume no MÁXIMO (1.0), duração maior (0.3s)
-            if (typeof synth !== 'undefined') synth.play('C4', 1.0, 0, 0.3);
+            if (typeof synth !== 'undefined') synth.play('C4', 1.0, 0, 0.3); // Play miss sound
           } catch (e) { console.log("Erro no som: ", e); }
-
         }
         
         current_trial++;              // Move on to the next trial/target
@@ -236,18 +232,15 @@ function continueTest()
 }
 
 // Creates and positions the UI targets
-// Creates and positions the UI targets
 function createTargets(target_size, horizontal_gap, vertical_gap)
 {
   targets = [];
   let t_size = target_size; 
-  let gap_x = 2; // Espaço horizontal entre botões
+  let gap_x = 2; // Horizontal gap between targets
 
-  // A GRANDE MUDANÇA: Calcula o MÁXIMO de botões que cabem na largura do ecrã
-  // (O "40" é para deixar apenas 20px de margem de cada lado e usar tudo o resto)
-  let max_cols = floor((width - 40) / (t_size + gap_x));
+  let max_cols = floor((width - 40) / (t_size + gap_x)); // Calculate max columns to fit screen
 
-  // 1. Instanciar os 80 alvos
+  // 1. Instantiate 80 targets
   for (var r = 0; r < GRID_ROWS; r++) {
     for (var c = 0; c < GRID_COLUMNS; c++) {
       let legendas_index = c + GRID_COLUMNS * r;
@@ -259,10 +252,10 @@ function createTargets(target_size, horizontal_gap, vertical_gap)
     }  
   }
 
-  // 2. Ordenar alfabeticamente
+  // 2. Sort targets alphabetically
   targets.sort((a, b) => a.label.localeCompare(b.label, 'pt', { sensitivity: 'base' }));
 
-  // 3. Agrupar os alvos pela letra inicial
+  // 3. Group targets by initial letter
   let groups = [];
   let current_char = "";
   let current_group = [];
@@ -278,24 +271,21 @@ function createTargets(target_size, horizontal_gap, vertical_gap)
   }
   if (current_group.length > 0) groups.push(current_group);
 
-  // 4. Distribuir os grupos por linhas usando a LARGURA MÁXIMA do ecrã
+  // 4. Distribute groups into rows
   let rows = [];
   let current_row = [];
 
   for (let i = 0; i < groups.length; i++) {
     let group = groups[i];
     
-    // Se o grupo couber na linha atual, junta-se aos outros de forma contínua
     if (current_row.length + group.length <= max_cols) {
       current_row.push(...group);
     } else {
-      // Se não couber, fechamos a linha atual e passamos o grupo inteiro para a próxima
       if (current_row.length > 0) {
         rows.push(current_row);
         current_row = [];
       }
       
-      // Caso extremo: Se uma ÚNICA letra tiver MAIS palavras do que a largura total do ecrã
       if (group.length > max_cols) {
          for (let j = 0; j < group.length; j++) {
              current_row.push(group[j]);
@@ -313,7 +303,7 @@ function createTargets(target_size, horizontal_gap, vertical_gap)
 
   let total_linhas = rows.length;
 
-  // 5. Calcular margens para centrar o bloco perfeitamente no ecrã (vertical e horizontal)
+  // 5. Calculate margins to center grid
   let available_h = height - 80;
   let required_h = t_size * total_linhas;
   
@@ -323,7 +313,7 @@ function createTargets(target_size, horizontal_gap, vertical_gap)
   let total_grid_h = (t_size * total_linhas) + (gap_y * (total_linhas - 1));
   let start_y = 40 + (available_h - total_grid_h) / 2;
 
-  // 6. Atribuir o X e Y final a cada alvo
+  // 6. Assign final X and Y to each target
   for (let r = 0; r < rows.length; r++) {
     let row_items = rows[r];
     
@@ -336,6 +326,7 @@ function createTargets(target_size, horizontal_gap, vertical_gap)
     }
   }
 }
+
 // Is invoked when the canvas is resized (e.g., when we go fullscreen)
 function windowResized() 
 {
